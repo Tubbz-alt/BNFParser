@@ -1,7 +1,7 @@
 import re, copy
 from symbol import Symbol, Production
 
-nonterms = []
+symbols = []
 
 # checks if prod rhs contains nonterm symbols
 def has_nonterms(expr):
@@ -48,7 +48,7 @@ def create_terminal(expr):
 
 # finds symbol by name from symbol list
 def get_symbol(name):
-    for symbol in nonterms:
+    for symbol in symbols:
         if symbol.name == name:
             return symbol
 
@@ -59,35 +59,31 @@ def split_expr(expr, separator):
 
 # tokenizes prod rhs
 def split_prod(expr):
-    global nonterms
-    symbols = []
+    global symbols
+    list = []
 
     expr = re.sub(" ", "", expr)
     expr = re.sub("\n", "", expr)                                               # in case terminal is at the end
 
     tokens1 = split_expr(expr, "\"")                                            # attempts to extract terminals
-    # print(tokens1)
 
     for item in tokens1:
         item = re.sub("\n", "", item)
-        # print(item)
 
         # split on " isolates terminals
         if is_terminal(item):
             terminal = create_terminal(item)
-            nonterms.append(terminal)                                           # terminals added immediately to the symbol list
-            symbols.append(terminal)
+            symbols.append(terminal)                                           # terminals added immediately to the symbol list
+            list.append(terminal)
         else:
             tokens2 = split_expr(item, ">")                                     # complex token; splits further and extracts nonterms
             if "" in tokens2:
                 tokens2.remove("")
-            # print("tokens2", tokens2)
             symbol_names = [(name + ">") for name in tokens2]
-            # print(symbol_names)
             for name in symbol_names:
-                symbols.append(get_symbol(name[1:-1]))
+                list.append(get_symbol(name[1:-1]))
 
-    return symbols
+    return list
 
 
 # converts prod rhs to list of alternatives
@@ -96,24 +92,23 @@ def make_prods(expr):
 
     alts = split_prods(expr)
     for alt in alts:
-        # print(alt)
         symbols = split_prod(alt)
-        # print(symbols)
         production = Production(symbols)
         prods.append(production)
 
     return prods
 
 
-def copy_dict(dict):
-    return copy.deepcopy(dict)
+def copy_obj(obj):
+    return copy.deepcopy(obj)
 
-# populates nonterm symbols list
-def create_nonterms(lines):
-    global nonterms
+
+# populates symbols list
+def create_symbols(lines):
+    global symbols
 
     rules = make_rules(lines)
-    rules_cpy = copy_dict(rules)
+    rules_cpy = copy_obj(rules)
 
     for rule in rules:
         name = rule[1:-1]
@@ -123,7 +118,7 @@ def create_nonterms(lines):
         if (not has_nonterms(expr)):
             symbol.regex = term_regex(expr)
             del rules_cpy[rule]
-        nonterms.append(symbol)
+        symbols.append(symbol)
 
     for rule in rules_cpy:
         name = rule[1:-1]
@@ -132,28 +127,38 @@ def create_nonterms(lines):
         symbol.prods = prods
 
 
+# TODO: upgrade
+def has_symbol(list, symbol):
+    for item in list:
+        if item.name == symbol.name:
+            return True
+    return False
+
+
 # finds the start symbol
+# start symbol can never appear on the prod rhs
+# TODO: can appear on its own rhs
+# test by swaping rules in .bnf file
 def find_root():
-    pass
+    symbol_names = [symbol.name for symbol in symbols]
+
+    for symbol in symbols:
+        for prod in symbol.prods:
+            for element in prod.symbols:
+                if element != symbol and element.name in symbol_names:           # start symbol can self-reference
+                        symbol_names.remove(element.name)
+
+    return get_symbol(symbol_names[0])                                          # TODO: check if there is more than 1 start symbol
 
 
 # updates symbol regexes
 def update_regex():
-    for symbol in nonterms:
+    for symbol in symbols:
         symbol.update_regex()
 
 
 # entry point
 def create_prod_graph(rules):
-    create_nonterms(rules)
-    #
-    # symbol = get_symbol("reg_oznaka")
-    # print(len(symbol.prods))
-    # for prod in symbol.prods:
-    #     for item in prod.symbols:
-    #         if item:
-    #             print(item.open_tag)
-    #         else:
-    #             print("NEMA")
+    create_symbols(rules)
     update_regex()
-    return nonterms[0]
+    return find_root()

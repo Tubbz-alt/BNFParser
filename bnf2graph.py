@@ -1,4 +1,4 @@
-import re
+import re, copy
 from symbol import Symbol, Production
 
 nonterms = []
@@ -30,20 +30,20 @@ def split_prods(expr):
     return expr.split("|")
 
 
-# checks if prod rhs element is literal
-def is_literal(expr):
+# checks if prod rhs element is terminal
+def is_terminal(expr):
     regex = "<.*>"
     compiled = re.compile(regex)
     match = compiled.search(expr)
     return not match
 
 
-# creates literal symbol
-def create_literal(expr):
-    literal = Symbol(expr, expr)
-    literal.open_tag = "<literal>"
-    literal.closed_tag = "</literal>"
-    return literal
+# creates terminal symbol
+def create_terminal(expr):
+    terminal = Symbol(expr, expr)
+    terminal.open_tag = "<terminal>"
+    terminal.closed_tag = "</terminal>"
+    return terminal
 
 
 # finds symbol by name from symbol list
@@ -53,27 +53,37 @@ def get_symbol(name):
             return symbol
 
 
+def split_expr(expr, separator):
+    return expr.split(separator)
+
+
 # tokenizes prod rhs
 def split_prod(expr):
     global nonterms
     symbols = []
 
     expr = re.sub(" ", "", expr)
-    expr = re.sub("\n", "", expr)                                               # in case literal is at the end
+    expr = re.sub("\n", "", expr)                                               # in case terminal is at the end
 
-    tokens1 = split_expr(expr, "\"")                                            # attempts to extract literals
+    tokens1 = split_expr(expr, "\"")                                            # attempts to extract terminals
+    # print(tokens1)
 
     for item in tokens1:
         item = re.sub("\n", "", item)
+        # print(item)
 
-        # split on " isolates literals
-        if is_literal(item):
-            literal = create_literal(item)
-            nonterms.append(literal)                                            # literals added immediately to the symbol list
-            symbols.append(literal)
+        # split on " isolates terminals
+        if is_terminal(item):
+            terminal = create_terminal(item)
+            nonterms.append(terminal)                                           # terminals added immediately to the symbol list
+            symbols.append(terminal)
         else:
-            tokens2 = split_expr(item, ">")                                     # complex token; splits further and extract non-literals
+            tokens2 = split_expr(item, ">")                                     # complex token; splits further and extracts nonterms
+            if "" in tokens2:
+                tokens2.remove("")
+            # print("tokens2", tokens2)
             symbol_names = [(name + ">") for name in tokens2]
+            # print(symbol_names)
             for name in symbol_names:
                 symbols.append(get_symbol(name[1:-1]))
 
@@ -86,12 +96,17 @@ def make_prods(expr):
 
     alts = split_prods(expr)
     for alt in alts:
+        # print(alt)
         symbols = split_prod(alt)
+        # print(symbols)
         production = Production(symbols)
         prods.append(production)
 
     return prods
 
+
+def copy_dict(dict):
+    return copy.deepcopy(dict)
 
 # populates nonterm symbols list
 def create_nonterms(lines):
@@ -131,5 +146,14 @@ def update_regex():
 # entry point
 def create_prod_graph(rules):
     create_nonterms(rules)
+    #
+    # symbol = get_symbol("reg_oznaka")
+    # print(len(symbol.prods))
+    # for prod in symbol.prods:
+    #     for item in prod.symbols:
+    #         if item:
+    #             print(item.open_tag)
+    #         else:
+    #             print("NEMA")
     update_regex()
     return nonterms[0]

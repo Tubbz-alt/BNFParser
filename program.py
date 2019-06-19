@@ -1,19 +1,18 @@
 import re
 import symbol
 import parse
+import bnf2graph
+import format
 
 
-text = "111-A222 B57 111A222"                                                   # sample text
+# text = "111-A222 B57 111A222"                                                   # sample text
 CONFIG_FILENAME = "config0.bnf"
 file = open(CONFIG_FILENAME)
 lines = file.readlines()
-root = symbol.tokenize(lines)
 
-# searches for root matches line by line
-compiled = re.compile(root.regex)
-pos = 0
-while compiled.search(text, pos):
-    match = compiled.search(text, pos)
-    parse.parse(root, match.group(0))
-    print("----------------------------------")
-    pos = match.end()
+root = bnf2graph.create_prod_graph(lines)                                       # TODO: return prod_graph with method find_root
+
+# tekst ide u input parse-a
+text = "AAA"
+parse_tree = parse.parse(root, text)
+format.print_parse_tree(parse_tree)

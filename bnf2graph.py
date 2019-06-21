@@ -43,6 +43,7 @@ def create_terminal(expr):
     terminal = Symbol(expr, expr)
     terminal.open_tag = "<terminal>"
     terminal.closed_tag = "</terminal>"
+    terminal.is_terminal = True
     return terminal
 
 
@@ -66,6 +67,7 @@ def split_prod(expr):
     expr = re.sub("\n", "", expr)                                               # in case terminal is at the end
 
     tokens1 = split_expr(expr, "\"")                                            # attempts to extract terminals
+    tokens1 = [token for token in tokens1 if token]
 
     for item in tokens1:
         item = re.sub("\n", "", item)
@@ -114,16 +116,12 @@ def create_symbols(lines):
         name = rule[1:-1]
         symbol = Symbol(name)
         expr = rules[rule]
-
-        if (not has_nonterms(expr)):
-            symbol.regex = term_regex(expr)
-            del rules_cpy[rule]
         symbols.append(symbol)
 
-    for rule in rules_cpy:
+    for rule in rules:
         name = rule[1:-1]
         symbol = get_symbol(name)
-        prods = make_prods(rules_cpy[rule])
+        prods = make_prods(rules[rule])
         symbol.prods = prods
 
 
@@ -151,14 +149,8 @@ def find_root():
     return get_symbol(symbol_names[0])                                          # TODO: check if there is more than 1 start symbol
 
 
-# updates symbol regexes
-def update_regex():
-    for symbol in symbols:
-        symbol.update_regex()
-
-
 # entry point
 def create_prod_graph(rules):
     create_symbols(rules)
-    update_regex()
+    # update_regex()
     return find_root()

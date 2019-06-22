@@ -23,10 +23,11 @@ class Symbol:
 
 
 
-PROD_ID = 1
+
 
 class Production:
     _productions = []
+    PROD_ID = 1
 
     @staticmethod
     def get_production(id):
@@ -37,11 +38,10 @@ class Production:
 
 
     def __init__(self, symbols = []):
-        global PROD_ID
-        self.id = PROD_ID
+        self.id = Production.PROD_ID
         self.symbols = symbols
         self.regex = ""
-        PROD_ID += 1
+        Production.PROD_ID += 1
         Production._productions.append(weakref.ref(self))
 
 

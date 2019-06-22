@@ -1,13 +1,13 @@
 from symbol import Production
 
-NODE_ID = 1
 
 class Node:
+    NODE_ID = 1
+
     def __init__(self, symbol):
-        global NODE_ID
         self.symbol = symbol
-        self.id = NODE_ID
-        NODE_ID += 1
+        self.id = Node.NODE_ID
+        Node.NODE_ID += 1
 
 
     @staticmethod

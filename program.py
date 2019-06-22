@@ -5,13 +5,13 @@ import parse
 import bnf
 import format
 import graph
+import settings
 from symbol import Production
 from parse import Parser, Prediction
 
 
 
-CONFIG_FILENAME = "config.bnf"
-file = open(CONFIG_FILENAME)
+file = open(settings.CONFIG_FILENAME)
 lines = file.readlines()
 
 start_symbol = bnf.create_prod_graph(lines)

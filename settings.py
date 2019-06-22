@@ -1,0 +1,2 @@
+CONFIG_FILENAME = "config.bnf"
+INDENTATION = 3

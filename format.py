@@ -1,7 +1,5 @@
+import settings
 from symbol import Production
-
-INDENTATION = 3
-
 
 def process_node(node, parse_graph, spacing = 0):
     symbol = node.symbol
@@ -13,7 +11,7 @@ def process_node(node, parse_graph, spacing = 0):
 
         children = parse_graph.vertices[node]
         for child in children:
-            process_node(child, parse_graph, spacing + INDENTATION)
+            process_node(child, parse_graph, spacing + settings.INDENTATION)
 
         print(spacing * " ", symbol.closed_tag)
 

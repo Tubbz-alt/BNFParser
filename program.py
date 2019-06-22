@@ -3,18 +3,24 @@ import symbol
 import parse
 import bnf2graph
 import format
+import graph
+from symbol import Production
 from parsing import Parser, Prediction
 
 
-# text = "111-A222 B57 111A222"                                                   # sample text
+
 CONFIG_FILENAME = "config0.bnf"
 file = open(CONFIG_FILENAME)
 lines = file.readlines()
 
-root = bnf2graph.create_prod_graph(lines)                                       # TODO: return prod_graph with method find_root
+start_symbol = bnf2graph.create_prod_graph(lines)                                    
 
 
 ###
-text = "111-A222"
-parser = Parser(text, root)
-parser.parse()
+text = "111-A234"
+parser = Parser(text, start_symbol)
+parse_arr = parser.parse()
+
+if parse_arr:
+    parse_graph = graph.create_parse_graph(start_symbol, parse_arr, Production._productions)
+    parse_graph.print()

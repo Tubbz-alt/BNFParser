@@ -1,6 +1,6 @@
 from symbol import Symbol, Production
+from token import Token
 import copy
-
 
 class Prediction:
     matched_input = []
@@ -11,10 +11,10 @@ class Prediction:
         Prediction.matched_input.append(Prediction.remaining_input[0])
         Prediction.remaining_input = Prediction.remaining_input[1:]
 
-        stop_parse = False
+        no_input = False
         if not Prediction.remaining_input:
-            stop_parse = True
-        return stop_parse
+            no_input = True
+        return no_input
 
 
     def __init__(self, start_symbol):
@@ -31,9 +31,7 @@ class Prediction:
             i += 1
 
 
-    # update analysis management
-    def move_term(self):
-        self.analysis.append(self.prediction[0])
+    def shift_symbol(self):
         self.prediction = self.prediction[1:]
 
 
@@ -43,7 +41,6 @@ class Prediction:
 
     def check_match(self):
         # only for predictions starting in terminal
-        # TODO: error-checking?
         return Prediction.remaining_input[0] == self.prediction[0]
 
 
@@ -59,10 +56,13 @@ class Prediction:
         return not self.has_term_next()
 
 
+    def is_empty(self):
+        return not self.prediction
+
+
     def print(self):
-        # TODO: print analysis
         for symbol in self.prediction:
-            print(symbol.name, end = " ")
+            print(symbol.name, end=" ")
         print()
 
 
@@ -82,6 +82,19 @@ class Parser:
     def clean_predictions(self):
         self.predictions = [prediction for prediction in self.predictions if not prediction.not_valid()]
 
+        no_predictions = False
+        if not self.predictions:
+            no_predictions = True
+        return no_predictions
+
+
+    def match_found(self):
+        match_found = False
+        for prediction in self.predictions:
+            if prediction.is_empty():
+                match_found = True
+        return match_found
+
 
     def fork_predictions(self):
         fork_again = False
@@ -89,15 +102,16 @@ class Parser:
 
         for prediction in self.predictions:
             # fork every production starting with nonterm
-            # so every leftmost nonterm is replaces with all of its alternatives
+            # so every leftmost nonterm is replaced with all of its alternatives
             if prediction.has_term_next():
                 new_preds.append(prediction)
             else:
                 nonterm = prediction.prediction[0]
-                alt_count = len(nonterm.prods)                 # no. of alt productions
+                alt_count = len(nonterm.prods)                                  # no. of alt productions
                 for i in range(alt_count):
                     pred_copy = prediction.copy_prediction()
                     pred_copy.replace_nonterm(nonterm.prods[i])
+                    pred_copy.analysis.append(nonterm.prods[i].id)
                     new_preds.append(pred_copy)
 
                     if pred_copy.has_nonterm_next():
@@ -119,26 +133,43 @@ class Parser:
         print("---------------------------------------------------")
 
 
-
-    def move_predictions(self):
+    def shift_predictions(self):
         for prediction in self.predictions:
-            prediction.move_term()
+            prediction.shift_symbol()
 
 
     def parse(self):
         stop_parse = False
         while (not stop_parse):
-            self.print()
             while(self.predictions and not stop_parse):
                 # fork until all the predictions start with term
-                # TODO: recursions
                 flag = True
                 while (flag):
                     flag = self.fork_predictions()
+                # all predictions start with term
 
+                print("-- forked predictions")
                 self.print()
-                print("... cleanup")
-                self.clean_predictions()
-                self.print()
-                self.move_predictions()
-                stop_parse = Prediction.process_symbol()
+
+                # clean predictions with terminal different from input symbol
+                print("-- cleaned predictions")
+                no_predictions = self.clean_predictions()
+                if no_predictions:
+                    print("NO PREDICTIONS")
+                    print("MATCH NOT FOUND")
+                    stop_parse = no_predictions
+
+                else:
+                    self.shift_predictions()
+                    no_input = Prediction.process_symbol()
+
+                    if no_input:
+                        print("PROCESSING DONE")
+                        print("MATCH%sFOUND" % (" " if self.match_found() else " NOT "))
+                        if self.match_found():
+                            success = self.predictions[0]
+                            return success.analysis                             # linearized parse tree
+                        else:
+                            return None
+
+                    stop_parse = no_input

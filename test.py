@@ -1,19 +1,29 @@
-import re
-import token
-import parse
+# CONFIG_FILENAME = "config0.bnf"
+# file = open(CONFIG_FILENAME)
+# lines = file.readlines()
+# for line in lines:
+#     arr = line.split(" ::= ")
+#     print(arr[0])
+
+# name = "<token>"
+# print(name[1:-1])
+
+#
+# str = "a|b|c"
+# arr = str.split("|")
+# for item in arr:
+#     print(item)
+
+class Foo:
+    def __init__(self):
+        self.data = 1
 
 
-text = "111-A222 B57 111A222"                   # sample text
-CONFIG_FILENAME = "config0.bnf"
-file = open(CONFIG_FILENAME)
-lines = file.readlines()
-root = token.tokenize(lines)
 
-# searches for root matches line by line
-compiled = re.compile(root.regex)
-pos = 0
-while compiled.search(text, pos):
-    match = compiled.search(text, pos)
-    parse.parse(root, match.group(0))
-    print("----------------------------------")
-    pos = match.end()
+dict = {}
+foo = Foo()
+dict[foo] = 1
+dict[foo] = 2
+
+for key in dict:
+    print(key, dict[key])

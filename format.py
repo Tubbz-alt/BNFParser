@@ -1,20 +1,24 @@
-import parse
+from symbol import Production
 
 INDENTATION = 3
 
-def print_token(token, parse_tree, spacing = 0):
-    print(spacing * " ", token.symbol.open_tag)
 
-    token = parse.find_token(token, parse_tree)
-    if not parse_tree[token]:
-        print(spacing * " ", token.match)
+def process_node(node, parse_graph, spacing = 0):
+    symbol = node.symbol
+
+    if symbol.is_terminal:
+        print(spacing * " ", symbol.name)
     else:
-        for child in parse_tree[token]:
-            print_token(child, parse_tree, spacing + INDENTATION)
+        print(spacing * " ", symbol.open_tag)
 
-    print(spacing * " ", token.symbol.closed_tag)
+        children = parse_graph.vertices[node]
+        for child in children:
+            process_node(child, parse_graph, spacing + INDENTATION)
+
+        print(spacing * " ", symbol.closed_tag)
 
 
-def print_parse_tree(parse_tree):
-    root_token = next(iter(parse_tree))
-    print_token(root_token, parse_tree)
+
+def make_XML_file(parse_graph):
+    root_node = next(iter(parse_graph.vertices))
+    process_node(root_node, parse_graph)

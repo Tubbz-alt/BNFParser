@@ -12,18 +12,18 @@ class Node:
 
     @staticmethod
     def make_nodes(production):
-        nodes = []
+        _nodes = []
         for symbol in production.symbols:
-            nodes.append(Node(symbol))
-        return nodes
+            _nodes.append(Node(symbol))
+        return _nodes
 
 
 
 class Graph:
     def __init__(self, start_symbol):
-        self.nodes = []
+        self._nodes = []
         self.vertices = {}
-        self.nodes.append(start_symbol)
+        self._nodes.append(start_symbol)
         self.vertices[start_symbol] = []
 
 
@@ -34,11 +34,11 @@ class Graph:
             self.vertices[node].append(child)
 
 
-    def replace_leftmost_prod(self, nodes):
-        self.nodes.pop(0)
-        for node in nodes:
+    def replace_leftmost_prod(self, _nodes):
+        self._nodes.pop(0)
+        for node in _nodes:
             if not node.symbol.is_terminal:
-                self.nodes.insert(0, node)
+                self._nodes.insert(0, node)
 
 
     def print(self):
@@ -57,10 +57,10 @@ def create_parse_graph(start_symbol, parse_arr, productions):
     parse_graph = Graph(start_node)
 
     while parse_arr:
-        while parse_graph.nodes[0].symbol.is_terminal:
-            parse_graph.nodes.pop(0)
+        while parse_graph._nodes[0].symbol.is_terminal:
+            parse_graph._nodes.pop(0)
 
-        parent = parse_graph.nodes[0]
+        parent = parse_graph._nodes[0]
         id = parse_arr.pop(0)
 
         production = Production.get_production(id)

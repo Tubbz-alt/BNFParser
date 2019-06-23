@@ -115,7 +115,6 @@ def create_symbols(lines):
     for rule in rules:
         name = rule[1:-1]
         symbol = Symbol(name)
-        expr = rules[rule]
         symbols.append(symbol)
 
     for rule in rules:
@@ -138,14 +137,18 @@ def has_symbol(list, symbol):
 # TODO: can appear on its own rhs
 # test by swaping rules in .bnf file
 def find_root():
+    print("\n\nfinding root")
     symbol_names = [symbol.name for symbol in symbols]
 
     for symbol in symbols:
+        print("testing symbol", symbol.open_tag)
         for prod in symbol.prods:
+            print("testing prod", prod.print())
             for element in prod.symbols:
                 if element != symbol and element.name in symbol_names:           # start symbol can self-reference
                         symbol_names.remove(element.name)
 
+    print("\n\n")
     return get_symbol(symbol_names[0])                                          # TODO: check if there is more than 1 start symbol
 
 

@@ -1,4 +1,4 @@
-<reg_oznaka> ::= <tricif>"-"<slovo><tricif>|<tricif><slovo><tricif>|<trislov>
+<reg_oznaka> ::= <tricif>"-"<slovo><tricif>|<tricif><slovo><tricif>|<trislov>|<reg_oznaka>"*"
 <tricif> ::= <cifra><cifra><cifra>
 <trislov> ::= <slovo><slovo><slovo>
 <slovo> ::= "A"|"E"|"O"|"M"|"K"

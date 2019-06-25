@@ -18,7 +18,7 @@ start_symbol = bnf.create_prod_graph(lines)
 
 
 ###
-text = "111-A234*111-A234"
+text = "AAEAA"
 parser = Parser(text, start_symbol)
 parse_arr = parser.parse()
 

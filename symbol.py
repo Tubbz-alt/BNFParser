@@ -12,6 +12,8 @@ class Symbol:
         self.regex = regex
         self.prods = []
         self.is_terminal = False
+        self.is_regex = False
+        self.matched = ""
         Symbol._symbols.append(weakref.ref(self))
 
 

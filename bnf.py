@@ -105,6 +105,11 @@ def copy_obj(obj):
     return copy.deepcopy(obj)
 
 
+def extract_regex(expr):
+    pos = expr.find("(")
+    return expr[pos+1:-2]
+
+
 # populates symbols list
 def create_symbols(lines):
     global symbols
@@ -120,8 +125,12 @@ def create_symbols(lines):
     for rule in rules:
         name = rule[1:-1]
         symbol = get_symbol(name)
-        prods = make_prods(rules[rule])
-        symbol.prods = prods
+        if "regex" in rules[rule]:
+            symbol.regex = extract_regex(rules[rule])
+            symbol.is_regex = True
+        else:
+            prods = make_prods(rules[rule])
+            symbol.prods = prods
 
 
 # TODO: upgrade
@@ -143,7 +152,7 @@ def find_root():
     for symbol in symbols:
         print("testing symbol", symbol.open_tag)
         for prod in symbol.prods:
-            print("testing prod", prod.print())
+            prod.print()
             for element in prod.symbols:
                 if element != symbol and element.name in symbol_names:           # start symbol can self-reference
                         symbol_names.remove(element.name)

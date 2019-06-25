@@ -1,4 +1,5 @@
 import copy
+import re
 from symbol import Symbol, Production
 
 
@@ -20,17 +21,25 @@ class Prediction:
             i += 1
 
 
-    def next_input_symbol(self):
+    def next_input_symbol(self, end = 1):                       # end may differ for shifting regex pred symbols
         self.prediction = self.prediction[1:]
-        self.pos += 1
+        self.pos += end
 
         no_input = self.pos == len(Prediction.input)
         return no_input
 
 
-    # checks if the first symbol in prediction (terminal) matches the current input symbol
+    # if the first symbol is terminal, discards if it doesn't match the current input symbol
+    # if the first symbol is regex, discards if it doesn't match any no of first input symbols
     def not_valid(self):
-        return Prediction.input[self.pos] != self.prediction[0].regex
+        if self.prediction[0].is_terminal:
+            return Prediction.input[self.pos] != self.prediction[0].regex
+        elif self.prediction[0].is_regex:
+            print("testing regex", self.prediction[0].regex)
+            print("input:", Prediction.input[self.pos:])
+            symbol = self.prediction[0]
+            compiled = re.compile(symbol.regex)
+            return not re.match(compiled, Prediction.input[self.pos:])
 
 
     def copy_prediction(self):
@@ -42,7 +51,11 @@ class Prediction:
 
 
     def has_nonterm_next(self):
-        return not self.has_term_next()
+        return not self.has_term_next() and not self.has_regex_next()
+
+
+    def has_regex_next(self):
+        return self.prediction[0].is_regex
 
 
     def is_empty(self):
@@ -76,6 +89,8 @@ class Parser:
     def fork_prediction(self, prediction):
         if prediction.has_term_next():
             Parser._new_predictions.append(prediction)
+        elif prediction.has_regex_next():
+            Parser._new_predictions.append(prediction)
         else:
             nonterm = prediction.prediction[0]
             alt_count = len(nonterm.prods)
@@ -88,8 +103,19 @@ class Parser:
 
     def shift_predictions(self):
         for prediction in self.predictions:
+            # prediction[0] is a matched terminal or regex
             if prediction.has_term_next():
                 no_input = prediction.next_input_symbol()
+                if no_input:
+                    successful_pred = prediction
+                    return successful_pred
+            elif prediction.has_regex_next():                                   # matched SOMETHING
+                compiled = re.compile(prediction.prediction[0].regex)
+                match = re.match(compiled, Prediction.input[prediction.pos:])
+                end = match.end()
+                no_input = prediction.next_input_symbol(end)
+                prediction.analysis.append({"match": match.group(0)})
+
                 if no_input:
                     successful_pred = prediction
                     return successful_pred
@@ -122,20 +148,20 @@ class Parser:
             self.predictions = Parser._new_predictions.copy()
             Parser._new_predictions.clear()
 
-            print("-- forked predictions")
-            self.print()
+            # print("-- forked predictions")
+            # self.print()
 
             # removes predictions with nonmatching terminal
             no_predictions = self.clean_predictions()
             # print("-- cleaned predictions")
-            # self.print()
+            self.print()
             if no_predictions:                                                  # <=> self.predictions is empty
                 print("NO PREDICTIONS LEFT")
                 print("MATCH NOT FOUND")
             else:
                 successful_pred = self.shift_predictions()
-                # print("-- shifted predictions")
-                # self.print()
+                print("-- shifted predictions")
+                self.print()
                 self.remove_empty_predictions()                                 # if there are still input symbols but no nonterms in prediction
                 # print("-- removed empty predictions")
                 # self.print()

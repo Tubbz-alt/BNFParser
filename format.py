@@ -9,9 +9,12 @@ def process_node(node, parse_graph, spacing = 0):
     else:
         print(spacing * " ", symbol.open_tag)
 
-        children = parse_graph.vertices[node]
-        for child in children:
-            process_node(child, parse_graph, spacing + settings.INDENTATION)
+        if node.is_regex:
+            print((spacing + settings.INDENTATION) * " ", node.match)
+        else:
+            children = parse_graph.vertices[node]
+            for child in children:
+                process_node(child, parse_graph, spacing + settings.INDENTATION)
 
         print(spacing * " ", symbol.closed_tag)
 

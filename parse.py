@@ -109,6 +109,8 @@ class Parser:
                 if no_input:
                     successful_pred = prediction
                     return successful_pred
+            # uvijek grabi najveci match, bez obzira na to sta dolazi poslije
+
             elif prediction.has_regex_next():                                   # matched SOMETHING
                 compiled = re.compile(prediction.prediction[0].regex)
                 match = re.match(compiled, Prediction.input[prediction.pos:])
@@ -116,7 +118,7 @@ class Parser:
                 no_input = prediction.next_input_symbol(end)
                 prediction.analysis.append({"match": match.group(0)})
 
-                if no_input:
+                if no_input and not prediction.prediction: # nema simbola poslije regex-a
                     successful_pred = prediction
                     return successful_pred
 
@@ -148,23 +150,23 @@ class Parser:
             self.predictions = Parser._new_predictions.copy()
             Parser._new_predictions.clear()
 
-            # print("-- forked predictions")
-            # self.print()
+            print("-- forked predictions")
+            self.print()
 
             # removes predictions with nonmatching terminal
             no_predictions = self.clean_predictions()
-            # print("-- cleaned predictions")
+            print("-- cleaned predictions")
             self.print()
             if no_predictions:                                                  # <=> self.predictions is empty
-                print("NO PREDICTIONS LEFT")
+                # print("NO PREDICTIONS LEFT")
                 print("MATCH NOT FOUND")
             else:
                 successful_pred = self.shift_predictions()
                 print("-- shifted predictions")
                 self.print()
                 self.remove_empty_predictions()                                 # if there are still input symbols but no nonterms in prediction
-                # print("-- removed empty predictions")
-                # self.print()
+                print("-- removed empty predictions")
+                self.print()
                 if successful_pred:
                     print("PROCESSING DONE")
                     print("MATCH FOUND")

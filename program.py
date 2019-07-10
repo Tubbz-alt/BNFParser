@@ -10,15 +10,19 @@ from symbol import Production
 from parse import Parser, Prediction
 
 
+def copy_init_config():
+    with open(settings.CONFIG_FILENAME) as in_file, open(settings.EXT_CONFIG_FILENAME, 'w') as out_file:
+        out_file.write("")
+        lines = in_file.readlines()
+        for line in lines:
+            out_file.write(line)
 
-file = open(settings.CONFIG_FILENAME)
-lines = file.readlines()
 
-start_symbol = bnf.create_prod_graph(lines)
-
+copy_init_config()
+start_symbol = bnf.create_prod_graph()
 
 ###
-text = "AAEAA"
+text = "051501302"
 parser = Parser(text, start_symbol)
 parse_arr = parser.parse()
 

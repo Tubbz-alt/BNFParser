@@ -1,4 +1,5 @@
 import re, copy
+import extended_bnf, settings
 from symbol import Symbol, Production
 
 symbols = []
@@ -146,23 +147,38 @@ def has_symbol(list, symbol):
 # TODO: can appear on its own rhs
 # test by swaping rules in .bnf file
 def find_root():
-    print("\n\nfinding root")
     symbol_names = [symbol.name for symbol in symbols]
 
     for symbol in symbols:
-        print("testing symbol", symbol.open_tag)
         for prod in symbol.prods:
-            prod.print()
             for element in prod.symbols:
                 if element != symbol and element.name in symbol_names:           # start symbol can self-reference
                         symbol_names.remove(element.name)
 
-    print("\n\n")
+    print("root symbol is:", symbol_names[0])
     return get_symbol(symbol_names[0])                                          # TODO: check if there is more than 1 start symbol
 
 
+# appends standard_expression regex nodes to config.bnf file
+def add_standard_exprs():
+    standard_exprs = extended_bnf.make_standard_exprs()
+
+    file = open(settings.EXT_CONFIG_FILENAME, 'a')
+    for expr in standard_exprs:
+        file.write("<" + expr[0] + "> ::= regex(" + expr[1] + ")" + "\n")
+    file.close()
+
+
+
+
 # entry point
-def create_prod_graph(rules):
-    create_symbols(rules)
+def create_prod_graph():
+    add_standard_exprs()
+
+    file = open(settings.EXT_CONFIG_FILENAME)
+    lines = file.readlines()
+    file.close()
+    create_symbols(lines)
+
     # update_regex()
     return find_root()

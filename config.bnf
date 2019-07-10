@@ -1,4 +1,4 @@
-<reg_oznaka> ::= <node>|<tricif>"-"<slovo><tricif>|<node><slovo>|<reg_oznaka><node><slovo>|<node>
+<reg_oznaka> ::= <node>|<broj_telefona>|<tricif>"-"<slovo><tricif>|<node><slovo>|<reg_oznaka><node><slovo>|<node>
 <tricif> ::= <cifra><cifra><cifra>
 <trislov> ::= <slovo><slovo><slovo>
 <slovo> ::= "A"|"E"|"O"|"M"|"K"

@@ -1,6 +1,6 @@
-CONFIG_FILENAME = "resources\\config.bnf"
-EXT_CONFIG_FILENAME = "resources\\config_final.bnf"
-CITIES_FILENAME = "resources\\veliki_gradovi.csv"
+CONFIG_FILENAME = "..\\resources\\config.bnf"
+EXT_CONFIG_FILENAME = "..\\resources\\config_final.bnf"
+CITIES_FILENAME = "..\\resources\\veliki_gradovi.csv"
 INDENTATION = 3
 
 

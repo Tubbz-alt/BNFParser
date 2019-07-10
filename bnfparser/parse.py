@@ -21,12 +21,15 @@ class Prediction:
             i += 1
 
 
+    def no_input(self):
+        return self.pos == len(Prediction.input)
+
+
     def next_input_symbol(self, end = 1):                       # end may differ for shifting regex pred symbols
         self.prediction = self.prediction[1:]
         self.pos += end
 
-        no_input = self.pos == len(Prediction.input)
-        return no_input
+        return self.no_input()
 
 
     # if the first symbol is terminal, discards if it doesn't match the current input symbol
@@ -69,6 +72,7 @@ class Prediction:
 
 
 
+
 class Parser:
     # temp array for storing forked predictions
     _new_predictions = []
@@ -106,7 +110,7 @@ class Parser:
             # prediction[0] is a matched terminal or regex
             if prediction.has_term_next():
                 no_input = prediction.next_input_symbol()
-                if no_input:
+                if no_input and not prediction.prediction:
                     successful_pred = prediction
                     return successful_pred
 
@@ -125,7 +129,7 @@ class Parser:
 
 
     def remove_empty_predictions(self):
-        self.predictions = [pred for pred in self.predictions if pred.prediction]
+        self.predictions = [pred for pred in self.predictions if (pred.prediction and not pred.no_input())]
 
 
     def print(self):

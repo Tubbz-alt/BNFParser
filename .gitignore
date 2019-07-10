@@ -104,3 +104,5 @@ venv.bak/
 .mypy_cache/
 test.py
 .vscode/launch.json
+bnfparser/in
+bnfparser/out

@@ -144,7 +144,6 @@ def has_symbol(list, symbol):
 
 # finds the start symbol
 # start symbol can never appear on the prod rhs
-# TODO: can appear on its own rhs
 # test by swaping rules in .bnf file
 def find_root():
     symbol_names = [symbol.name for symbol in symbols]
@@ -169,10 +168,9 @@ def add_standard_exprs():
     file.close()
 
 
-
-
 # entry point
 def create_prod_graph():
+    # adds additional regex nodes to config
     add_standard_exprs()
 
     file = open(settings.EXT_CONFIG_FILENAME)

@@ -19,7 +19,6 @@ def process_node(node, parse_graph, spacing = 0):
         print(spacing * " ", symbol.closed_tag)
 
 
-
 def make_XML_file(parse_graph):
     root_node = next(iter(parse_graph.vertices))
     process_node(root_node, parse_graph)

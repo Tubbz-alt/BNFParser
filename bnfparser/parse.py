@@ -30,7 +30,7 @@ class Prediction:
 
 
     # if the first symbol is terminal, discards if it doesn't match the current input symbol
-    # if the first symbol is regex, discards if it doesn't match any no of first input symbols
+    # if the first symbol is regex, discards if it doesn't match any of the first input symbols
     def not_valid(self):
         if self.prediction[0].is_terminal:
             return Prediction.input[self.pos] != self.prediction[0].regex
@@ -109,8 +109,8 @@ class Parser:
                 if no_input:
                     successful_pred = prediction
                     return successful_pred
-            # uvijek grabi najveci match, bez obzira na to sta dolazi poslije
 
+            # gets the longest possible match (TODO: fix)
             elif prediction.has_regex_next():                                   # matched SOMETHING
                 compiled = re.compile(prediction.prediction[0].regex)
                 match = re.match(compiled, Prediction.input[prediction.pos:])
@@ -118,7 +118,8 @@ class Parser:
                 no_input = prediction.next_input_symbol(end)
                 prediction.analysis.append({"match": match.group(0)})
 
-                if no_input and not prediction.prediction: # nema simbola poslije regex-a
+                # if no input and no more symbols after regex node
+                if no_input and not prediction.prediction: 
                     successful_pred = prediction
                     return successful_pred
 
@@ -146,7 +147,7 @@ class Parser:
                 # forks predictions starting with nonterm
                 self.fork_prediction(prediction)
 
-            # swap current predictions arr with forked
+            # swaps current predictions arr with forked
             self.predictions = Parser._new_predictions.copy()
             Parser._new_predictions.clear()
 

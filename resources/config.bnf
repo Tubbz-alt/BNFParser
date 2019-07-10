@@ -1,6 +1,5 @@
-<reg_oznaka> ::= <node>|<broj_telefona>|<tricif>"-"<slovo><tricif>|<node><slovo>|<reg_oznaka><node><slovo>|<node>
+<reg_oznaka> ::= <tricif>"-"<slovo><tricif>
 <tricif> ::= <cifra><cifra><cifra>
 <trislov> ::= <slovo><slovo><slovo>
 <slovo> ::= "A"|"E"|"O"|"M"|"K"
 <cifra> ::= "1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"|"0"
-<node> ::= regex(.*)

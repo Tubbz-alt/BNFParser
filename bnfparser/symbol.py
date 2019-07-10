@@ -25,8 +25,6 @@ class Symbol:
 
 
 
-
-
 class Production:
     _productions = []
     PROD_ID = 1

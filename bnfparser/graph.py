@@ -63,7 +63,6 @@ def find_match(parse_arr):
             return item["match"]
 
 
-
 def create_parse_graph(start_symbol, parse_arr, productions):
     start_node = Node(start_symbol)
     parse_graph = Graph(start_node)

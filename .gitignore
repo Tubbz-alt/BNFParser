@@ -106,3 +106,6 @@ test.py
 .vscode/launch.json
 bnfparser/in
 bnfparser/out
+*.json
+.vs/BNFParser/v16/.suo
+.vs/slnx.sqlite

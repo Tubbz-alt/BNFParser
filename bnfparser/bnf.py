@@ -137,10 +137,14 @@ def remove_nonproductive_symbols():
     return productive_symbols
 
 
-def remove_unreachable_symbols(root):
+def remove_nonproductive_productions():
     global symbols
-    productive = symbols            # for nested iterating
-
+    # symbols [] contains productive symbols
+    for symbol in symbols:
+        # checking if it has any prod alternative with a non-productive symbol
+        for prod in symbol.prods:
+            if not prod.is_productive(symbols):
+                symbol.prods.remove(prod)
 
     
 # populates symbols list
@@ -202,17 +206,23 @@ def add_standard_exprs():
 def create_prod_graph():
     global symbols
     # adds additional regex nodes to config
-    # add_standard_exprs()
+    add_standard_exprs()
 
     with open(settings.EXT_CONFIG_FILENAME) as file:
         lines = file.readlines()
    
     create_symbols(lines)
-    symbols = remove_nonproductive_symbols()
-    print("productive:")
+    print("-- symbols:")
     for symbol in symbols:
         print(symbol.name)
+    print("--------")
+
+    symbols = remove_nonproductive_symbols()
+    print("-- productive symbols:")
+    for symbol in symbols:
+        print(symbol.name)
+    print("--------")
 
     root = find_root()
-    # symbols = remove_unreachable_symbols(root)
+    remove_nonproductive_productions()
     return root

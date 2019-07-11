@@ -18,19 +18,19 @@ settings.copy_init_config()
 # find root symbol
 start_symbol = bnf.create_prod_graph()
 
-# text to parse
-in_filename = sys.argv[1]
-out_filename = sys.argv[2]
-util.clear_file(out_filename)
+# # text to parse
+# in_filename = sys.argv[1]
+# out_filename = sys.argv[2]
+# util.clear_file(out_filename)
 
-text = ""
-with open(in_filename) as in_file:
-    text += in_file.readline()
+# text = ""
+# with open(in_filename) as in_file:
+#     text += in_file.readline()
 
-# parse
-parser = Parser(text, start_symbol)
-parse_arr = parser.parse()
+# # parse
+# parser = Parser(text, start_symbol)
+# parse_arr = parser.parse()
 
-if parse_arr:
-    parse_graph = graph.create_parse_graph(start_symbol, parse_arr, Production._productions)
-    format.make_XML_file(parse_graph, out_filename)
+# if parse_arr:
+#     parse_graph = graph.create_parse_graph(start_symbol, parse_arr, Production._productions)
+#     format.make_XML_file(parse_graph, out_filename)
